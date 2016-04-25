@@ -10,7 +10,10 @@ define tp_docker::run (
   Variant[Undef,String]   $repository          = $title,
   Variant[Undef,String]   $repository_tag      = undef,
 
+  String                  $container_name      = $title,
+
   Pattern[/service|command/] $run_mode         = 'command',
+  String                     $run_options      = '',
 
   Variant[Undef,Array]    $exec_environment    = undef,
   Variant[Undef,String]   $init_template       = 'tp_docker/init.erb',
@@ -34,6 +37,7 @@ define tp_docker::run (
     }
 
     exec { "docker run ${username}/${repository}:${repository_tag}":
+      command     => "docker run ${run_options} ${username}/${repository}:${repository_tag}",
       unless      => "docker ps | grep ${username}/${repository} | grep ${repository_tag}",
     }
   }

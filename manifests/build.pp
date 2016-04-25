@@ -19,6 +19,7 @@ define tp_docker::build (
   Variant[Undef,String]   $repository_tag      = 'latest',
 
   Variant[Undef,Array]    $exec_environment    = undef,
+  Variant[Boolean,Pattern[/on_failure/]] $exec_logoutput = 'on_failure',
 
   String                  $build_options       = '',
   Pattern[/command|supervisor/] $command_mode  = 'supervisor',
@@ -58,10 +59,11 @@ define tp_docker::build (
     content => template($template),
   }
 
-  exec { "docker build ${build_options} -t ${username}/${repository}:${real_repository_tag} ${basedir_path}":
+  exec { "docker build ${build_options} -t ${username}/${repository}:${repository_tag} ${basedir_path}":
     cwd         => $basedir_path,
     subscribe   => File["${basedir_path}/Dockerfile"],
     environment => $exec_environment,
+    logoutput   => $exec_logoutput,
   }
 
 }

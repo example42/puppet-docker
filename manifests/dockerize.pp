@@ -27,7 +27,6 @@ define tp_docker::dockerize (
   Variant[Undef,String]   $repository_tag      = undef,
 
   Boolean                 $run                 = true,
-  Boolean                 $create              = false,
   Boolean                 $build               = false,
   Boolean                 $push                = false,
 
@@ -72,7 +71,7 @@ define tp_docker::dockerize (
   }
 
   # Dockerfile creation
-  if $create {
+  if $build {
     tp_docker::build { $app:
       ensure           => $ensure,
       build_options    => $build_options,
@@ -104,31 +103,6 @@ define tp_docker::dockerize (
       repository_tag   => $real_repository_tag,
       exec_environment => $exec_environment,
       run_mode         => $run_mode,
-    }
-  if $run {
-    $service_ensure = $ensure ? {
-      'absent' => 'stopped',
-      false    => 'stopped',
-      default  => $settings[service_ensure],
-    }
-    $service_enable = $ensure ? {
-      'absent' => false,
-      false    => false,
-      default  => $settings[service_enable],
-    }
-    exec { "docker pull ${username}/${real_repository}:${real_repository_tag}":
-      unless      => "docker images | grep ${username}/${real_repository} | grep ${real_repository_tag}",
-      environment => $exec_environment,
-    }
-    file { "/etc/init/docker-${app}":
-      ensure  => $ensure,
-      content => template($init_template),
-      mode    => '0755',
-      notify  => Service["docker-${app}"],
-    }
-    service { "docker-${app}":
-      ensure  => $service_ensure,
-      enable  => $service_enable,
     }
   }
 
