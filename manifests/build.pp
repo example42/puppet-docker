@@ -13,7 +13,7 @@ define tp_docker::build (
   String[1]               $osversion           = $::operatingsystemmajrelease,
 
   Variant[Undef,String]   $maintainer          = undef,
-  Variant[Undef,String]   $from                = undef,
+  String                  $from                = '',
 
   Variant[Undef,String]   $repository          = $title,
   Variant[Undef,String]   $repository_tag      = 'latest',
@@ -40,7 +40,7 @@ define tp_docker::build (
   $settings = $tp_settings + $settings_hash
 
   $real_from = $from ? {
-    undef   => "${os}:${osversion}",
+    ''      => "${os}:${osversion}",
     default => $from,
   }
   $basedir_path = "${workdir}/${username}/${os}/${osversion}/${app}"
