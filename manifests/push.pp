@@ -1,6 +1,6 @@
-# @define tp_docker::push
+# @define docker::push
 #
-define tp_docker::push (
+define docker::push (
 
   String[1]               $ensure              = 'present',
 

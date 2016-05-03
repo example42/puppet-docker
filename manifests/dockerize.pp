@@ -1,4 +1,4 @@
-# @define tp_docker::dockerize
+# @define docker::dockerize
 #
 # This define dockerizes an application.
 # It can:
@@ -7,7 +7,7 @@
 #   - Push the image to Docker Hub (default:false)
 #   - Run the image from the Docker Hub (default:true)
 #
-define tp_docker::dockerize (
+define docker::dockerize (
 
   String[1]               $ensure              = 'present',
 
@@ -71,7 +71,7 @@ define tp_docker::dockerize (
 
   # Dockerfile creation
   if $build {
-    tp_docker::build { $app:
+    docker::build { $app:
       ensure           => $ensure,
       build_options    => $build_options,
       username         => $username,
@@ -83,7 +83,7 @@ define tp_docker::dockerize (
 
   # Image upload to Docker Hub
   if $push {
-    tp_docker::push { $app:
+    docker::push { $app:
       ensure           => $ensure,
       username         => $username,
       repository       => $real_repository,
@@ -94,7 +94,7 @@ define tp_docker::dockerize (
 
   # Image run
   if $run {
-    tp_docker::run { $app:
+    docker::run { $app:
       ensure           => $ensure,
       username         => $username,
       repository       => $real_repository,

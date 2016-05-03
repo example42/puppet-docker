@@ -1,10 +1,10 @@
-# @define tp_docker::build
+# @define docker::build
 #
-define tp_docker::build (
+define docker::build (
 
   String[1]               $ensure              = 'present',
 
-  Variant[Undef,String]   $template            = 'tp_docker/Dockerfile.erb',
+  Variant[Undef,String]   $template            = 'docker/Dockerfile.erb',
   String[1]               $workdir             = '/var/tmp',
 
   String[1]               $username            = 'example42',

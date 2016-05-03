@@ -1,8 +1,8 @@
-# @define tp_docker::run
+# @define docker::run
 #
 # This define manages and runs a container based on the given docker image
 #
-define tp_docker::run (
+define docker::run (
 
   String[1]               $ensure              = 'running',
 
@@ -16,7 +16,7 @@ define tp_docker::run (
   String                     $run_options      = '',
 
   Variant[Undef,Array]    $exec_environment    = undef,
-  Variant[Undef,String]   $init_template       = 'tp_docker/init.erb',
+  Variant[Undef,String]   $init_template       = 'docker/init.erb',
 
   Boolean                 $mount_data_dir      = true,
   Boolean                 $mount_log_dir       = true,

@@ -1,6 +1,6 @@
-# @class tp_docker
+# @class docker
 #
-class tp_docker (
+class docker (
 
   String[1]               $ensure              = 'present',
 
@@ -16,15 +16,15 @@ class tp_docker (
   ) {
 
   if $run {
-    create_resources('tp_docker::run', $run )
+    create_resources('docker::run', $run )
   }
   if $build {
-    create_resources('tp_docker::build', $build )
+    create_resources('docker::build', $build )
   }
   if $test {
-    create_resources('tp_docker::test', $test )
+    create_resources('docker::test', $test )
   }
   if $push {
-    create_resources('tp_docker::push', $push )
+    create_resources('docker::push', $push )
   }
 }
