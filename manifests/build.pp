@@ -9,8 +9,8 @@ define docker::build (
 
   String[1]               $username            = 'example42',
 
-  String[1]               $os                  = downcase($::operatingsystem),
-  String[1]               $osversion           = $::operatingsystemmajrelease,
+  String[1]               $image_os            = downcase($::operatingsystem),
+  String[1]               $image_osversion     = $::operatingsystemmajrelease,
 
   Variant[Undef,String]   $maintainer          = undef,
   String                  $from                = '',
@@ -40,10 +40,10 @@ define docker::build (
   $settings = $tp_settings + $settings_hash
 
   $real_from = $from ? {
-    ''      => "${os}:${osversion}",
+    ''      => "${image_os}:${image_osversion}",
     default => $from,
   }
-  $basedir_path = "${workdir}/${username}/${os}/${osversion}/${app}"
+  $basedir_path = "${workdir}/${username}/${image_os}/${image_osversion}/${app}"
 
   Exec {
     path    => '/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin',

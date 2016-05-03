@@ -3,7 +3,8 @@
 class docker (
 
   Variant[Boolean,String] $ensure           = present,
-
+  String[1]               $username         = 'example42',
+  
   Hash                    $confs            = { },
   Hash                    $dirs             = { },
 

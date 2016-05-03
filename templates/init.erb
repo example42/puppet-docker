@@ -9,5 +9,5 @@ respawn
 respawn limit 10 5
 umask 022
 
-exec <%= @settings['process_name'] %> <% if @settings['process_args'] %><%= @settings['process_args'] %><% end %>
+exec <%= @app_settings['process_name'] %> <% if @app_settings['process_args'] %><%= @app_settings['process_args'] %><% end %>
 
