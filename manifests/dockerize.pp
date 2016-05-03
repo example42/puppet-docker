@@ -34,7 +34,7 @@ define tp_docker::dockerize (
 
   String                  $build_options       = '',
   Pattern[/command|supervisor/] $command_mode  = 'supervisor',
-  Pattern[/service|commnad/]    $run_mode      = 'command',
+  Pattern[/service|command/]    $run_mode      = 'command',
 
   Boolean                 $mount_data_dir      = true,
   Boolean                 $mount_log_dir       = true,
@@ -63,7 +63,6 @@ define tp_docker::dockerize (
     undef   => "${os}:${osversion}",
     default => $from,
   }
-  $basedir_path = "${workdir}/${username}/${os}/${osversion}/${app}"
 
   Exec {
     path    => '/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin',
@@ -78,7 +77,6 @@ define tp_docker::dockerize (
       username         => $username,
       repository       => $real_repository,
       repository_tag   => $real_repository_tag,
-      basedir_path     => $basedir_path:
       exec_environment => $exec_environment,
     }
   }
