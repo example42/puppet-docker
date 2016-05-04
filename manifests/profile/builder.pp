@@ -28,6 +28,8 @@ class docker::profile::builder (
 
   include ::docker
 
+  tp::install { 'git': }
+  tp::install { 'r10k': }
   tp::dir { 'docker::tp-dockerfiles':
     source      => 'https://github.com/example42/tp-dockerfiles',
     path        => '/etc/tp-dockerfiles',
@@ -54,8 +56,9 @@ class docker::profile::builder (
       command_mode     => pick_default($opts['command_mode'],$command_mode),
       mount_data_dir   => pick_default($opts['mount_data_dir'],$mount_data_dir),
       mount_log_dir    => pick_default($opts['mount_log_dir'],$mount_log_dir),
-      settings_hash    => $settings_hash,
-      data_module      => $data_module,
+      conf_hash        => pick_default($opts['conf_hash'],{ }),
+      dir_hash         => pick_default($opts['dir_hash'],{ }),
+      data_module      => $::docker::tinydata_module,
     }
   }
 
