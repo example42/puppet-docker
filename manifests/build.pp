@@ -27,6 +27,7 @@ define docker::build (
   Boolean                 $mount_data_dir      = true,
   Boolean                 $mount_log_dir       = true,
 
+  Boolean                 $copy_data_on_image  = true,
   Hash                    $conf_hash           = { },
   Hash                    $dir_hash            = { },
 
