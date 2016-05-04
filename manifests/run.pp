@@ -6,6 +6,9 @@ define docker::run (
 
   String[1]               $ensure              = 'running',
 
+  Variant[Undef,String]   $image               = undef,
+  String                  $command             = '',
+
   String[1]               $username            = undef,
   Variant[Undef,String]   $repository          = $title,
   Variant[Undef,String]   $repository_tag      = undef,
@@ -14,11 +17,12 @@ define docker::run (
 
   Pattern[/service|command/] $run_mode         = 'command',
   String                     $run_options      = '',
+  String                     $service_prefix   = 'docker-',
 
   Variant[Undef,Array]    $exec_environment    = undef,
   Variant[Boolean,Pattern[/on_failure/]] $exec_logoutput = 'on_failure',
 
-  Variant[Undef,String]   $init_template       = 'docker/init.erb',
+  Variant[Undef,String]   $init_template       = undef,
 
   Boolean                 $mount_data_dir      = true,
   Boolean                 $mount_log_dir       = true,
@@ -33,9 +37,27 @@ define docker::run (
     undef   => $::docker::username,
     default => $username
   }
-  $app = $title
-  $tp_app_settings = tp_lookup($app,'settings',$::docker::tinydata_module,'merge')
-  $app_settings = $tp_app_settings + $settings
+  $app = regsubst($title, '[^0-9A-Za-z.\-]', '-', 'G')
+  #  $tp_app_settings = tp_lookup($app,'settings',$::docker::tinydata_module,'merge')
+  # $app_settings = $tp_app_settings + $settings
+
+  case $::docker::module_settings['init_system'] {
+    'upstart': {
+      $initscript_file_path = "/etc/init/${service_prefix}${app}.conf"
+      $default_template = 'docker/run/upstart.erb'
+      $init_file_mode = '0644'
+    }
+    'systemd': {
+      $initscript_file_path = "/etc/systemd/system/${service_prefix}${app}.service"
+      $default_template = 'docker/run/systemd.erb'
+      $init_file_mode = '0644'
+    }
+    'sysvinit': {
+      $initscript_file_path = "/etc/init.d/${service_prefix}${app}"
+      $default_template = 'docker/run/sysvinit.erb'
+      $init_file_mode = '0755'
+    }
+  }
 
   if $run_mode == 'command' {
     Exec {
@@ -45,8 +67,12 @@ define docker::run (
       logoutput   => $exec_logoutput,
     }
 
-    exec { "docker run ${real_username}/${repository}:${repository_tag}":
-      command     => "docker run ${run_options} ${real_username}/${repository}:${repository_tag}",
+    $real_image = $image ? {
+      undef   => "${real_username}/${repository}:${repository_tag}",
+      default => $image,
+    }
+    exec { "docker run ${real_image}":
+      command     => "docker run ${run_options} ${real_image} ${command}",
       unless      => "docker ps | grep ${real_username}/${repository} | grep ${repository_tag}",
     }
   }
@@ -62,10 +88,10 @@ define docker::run (
       false    => false,
       default  => $::docker::module_settings['service_enable'],
     }
-    file { "/etc/init/docker-${app}.conf":
+    file { $initscript_file_path:
       ensure  => $ensure,
-      content => template($init_template),
-      mode    => '0755',
+      content => template(pick_default($init_template,$default_template)),
+      mode    => $init_file_mode,
       notify  => Service["docker-${app}"],
     }
     service { "docker-${app}":
