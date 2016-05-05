@@ -40,7 +40,8 @@ define docker::build (
   include ::docker
 
   # Settings evaluation
-  $app = $title
+  $title_elements = split ($title, '::')
+  $app = $title_elements[0]
   $tp_settings = tp_lookup($app,'settings',$data_module,'merge')
   $settings_supervisor = tp_lookup('supervisor','settings',$data_module,'merge')
   $settings = $tp_settings + $settings_hash
@@ -68,18 +69,18 @@ define docker::build (
 
   # Extra confs or dirs creation
   $conf_hash.each |$conf_name,$conf_options| {
-    tp::conf { "${title}::docker::build::${conf_name}":
+    tp::conf { "${conf_name}::docker::build":
       ensure              => pick_default($conf_options['ensure'],present),
       source              => pick_undef($conf_options['source']),
-      template            => pick_default($conf_options['template'],undef),
-      epp                 => pick_default($conf_options['epp'],undef),
-      content             => pick_default($conf_options['content'],undef),
-      base_dir            => pick_default($conf_options['base_dir'],'config'),
+      template            => pick_undef($conf_options['template']),
+      epp                 => pick_undef($conf_options['epp']),
+      content             => pick_undef($conf_options['content']),
+      base_dir            => pick_undef($conf_options['base_dir']),
       base_file           => pick_default($conf_options['base_file'],'config'),
-      path                => pick_default($conf_options['path'],undef),
-      mode                => pick_default($conf_options['mode'],undef),
-      owner               => pick_default($conf_options['owner'],undef),
-      group               => pick_default($conf_options['group'],undef),
+      path                => pick_undef($conf_options['path']),
+      mode                => pick_undef($conf_options['mode']),
+      owner               => pick_undef($conf_options['owner']),
+      group               => pick_undef($conf_options['group']),
       path_prefix         => "${basedir_path}/root",
       path_parent_create  => true,
       config_file_notify  => false,
@@ -92,19 +93,19 @@ define docker::build (
   }
 
   $dir_hash.each |$dir_name,$dir_options| {
-    tp::dir { "${title}::docker::build::${dir_name}":
+    tp::dir { "${dir_name}::docker::build":
       ensure              => pick_default($dir_options['ensure'],present),
-      source              => pick_default($dir_options['source'],undef),
-      vcsrepo             => pick_default($dir_options['vcsrepo'],undef),
+      source              => pick_undef($dir_options['source']),
+      vcsrepo             => pick_undef($dir_options['vcsrepo']),
       base_dir            => pick_default($dir_options['base_dir'],'config'),
-      path                => pick_default($dir_options['path'],undef),
-      mode                => pick_default($dir_options['mode'],undef),
-      owner               => pick_default($dir_options['owner'],undef),
-      group               => pick_default($dir_options['group'],undef),
+      path                => pick_undef($dir_options['path']),
+      mode                => pick_undef($dir_options['mode']),
+      owner               => pick_undef($dir_options['owner']),
+      group               => pick_undef($dir_options['group']),
       path_prefix         => "${basedir_path}/root",
       path_parent_create  => true,
       config_dir_notify   => false,
-      config_dir_require  => true,
+      config_dir_require  => false,
       purge               => pick_default($dir_options['purge'],false),
       recurse             => pick_default($dir_options['recurse'],false),
       force               => pick_default($dir_options['force'],false),
@@ -121,6 +122,7 @@ define docker::build (
     environment => $exec_environment,
     logoutput   => $exec_logoutput,
     refreshonly => true,
+    require     => Class['docker'],
   }
 
 }
