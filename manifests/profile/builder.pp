@@ -24,6 +24,7 @@ class docker::profile::builder (
   Boolean                 $mount_data_dir      = true,
   Boolean                 $mount_log_dir       = true,
 
+  Boolean                 $push                = false,
 ) {
 
   include ::docker
@@ -59,4 +60,18 @@ class docker::profile::builder (
     }
   }
 
+  if $push {
+    $images.each |$image,$opts| {
+      if $opts['push'] != false {
+        docker::push { $image:
+          ensure           => pick_default($opts['ensure'],$ensure),
+          username         => pick_default($opts['username'],$::docker::username),
+          repository       => pick($opts['repository'],$image),
+          repository_tag   => pick($opts['repository_tag'],$real_repository_tag),
+          exec_environment => pick($opts['exec_environment'],$exec_environment),
+          data_module      => $::docker::tinydata_module,
+        }
+      }
+    }
+  }
 }
