@@ -2,38 +2,40 @@
 #
 define docker::build (
 
-  String[1]               $ensure              = 'present',
+  String[1]                              $ensure              = 'present',
 
-  Variant[Undef,String]   $template            = 'docker/Dockerfile.erb',
-  String[1]               $workdir             = '/var/tmp',
+  Variant[Undef,String]                  $template            = 'docker/Dockerfile.erb',
+  String[1]                              $workdir             = '/var/tmp',
 
-  String[1]               $username            = '',
+  String[1]                              $username            = '',
 
-  String[1]               $image_os            = downcase($::operatingsystem),
-  String[1]               $image_osversion     = $::operatingsystemmajrelease,
+  String                                 $image_name          = '',
+  String[1]                              $image_os            = downcase($::operatingsystem),
+  String[1]                              $image_osversion     = $::operatingsystemmajrelease,
 
-  Variant[Undef,String]   $maintainer          = undef,
-  String                  $from                = '',
+  Variant[Undef,String]                  $maintainer          = undef,
+  String                                 $from                = '',
 
-  Variant[Undef,String]   $repository          = $title,
-  Variant[Undef,String]   $repository_tag      = 'latest',
+  Variant[Undef,String]                  $repository          = $title,
+  Variant[Undef,String]                  $repository_tag      = 'latest',
 
-  Variant[Undef,Array]    $exec_environment    = undef,
-  Variant[Boolean,Pattern[/on_failure/]] $exec_logoutput = 'on_failure',
+  Variant[Undef,Array]                   $exec_environment    = undef,
+  Variant[Boolean,Pattern[/on_failure/]] $exec_logoutput      = 'on_failure',
 
-  String                  $build_options       = '',
-  Pattern[/command|supervisor/] $command_mode  = 'supervisor',
+  Boolean                                $always_build        = true,
+  String                                 $build_options       = '',
+  Pattern[/command|supervisor/]          $command_mode        = 'supervisor',
 
-  Boolean                 $mount_data_dir      = true,
-  Boolean                 $mount_log_dir       = true,
+  Boolean                                $mount_data_dir      = true,
+  Boolean                                $mount_log_dir       = true,
 
-  Boolean                 $copy_data_on_image  = true,
-  Hash                    $conf_hash           = { },
-  Hash                    $dir_hash            = { },
+  Boolean                                $copy_data_on_image  = true,
+  Hash                                   $conf_hash           = { },
+  Hash                                   $dir_hash            = { },
 
-  Hash                    $settings_hash       = {},
+  Hash                                   $settings_hash       = {},
 
-  String[1]               $data_module         = 'tinydata',
+  String[1]                              $data_module         = 'tinydata',
 
   ) {
 
@@ -51,7 +53,10 @@ define docker::build (
     default => $from,
   }
   $basedir_path = "${workdir}/${username}/${image_os}/${image_osversion}/${app}"
-  $image_name = "${username}/${repository}:${repository_tag}"
+  $real_image_name = $image_name ? {
+    ''      => "${username}/${repository}:${repository_tag}",
+    default => $image_name,
+  }
 
   Exec {
     path    => '/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin',
@@ -88,7 +93,7 @@ define docker::build (
       options_hash        => pick_default($conf_options['options_hash'],{ }),
       settings_hash       => pick_default($conf_options['settings_hash'],{ } ),
       data_module         => pick_default($conf_options['data_module'],'tinydata'),
-      notify              => Exec["docker build ${build_options} -t ${image_name} ${basedir_path}"],
+      notify              => Exec["docker build ${build_options} -t ${real_image_name} ${basedir_path}"],
     }
   }
 
@@ -111,17 +116,21 @@ define docker::build (
       force               => pick_default($dir_options['force'],false),
       settings_hash       => pick_default($dir_options['settings_hash'],{ } ),
       data_module         => pick_default($dir_options['data_module'],'tinydata'),
-      notify              => Exec["docker build ${build_options} -t ${image_name} ${basedir_path}"],
+      notify              => Exec["docker build ${build_options} -t ${real_image_name} ${basedir_path}"],
     }
   }
 
-  exec { "docker build ${build_options} -t ${image_name} ${basedir_path}":
-    command     => "docker build ${build_options} -t ${image_name} ${basedir_path}",
+  $exec_refreshonly = $always_build ? {
+    true  => false,
+    false => true,
+  }
+  exec { "docker build ${build_options} -t ${real_image_name} ${basedir_path}":
+    command     => "docker build ${build_options} -t ${real_image_name} ${basedir_path}",
     cwd         => $basedir_path,
     subscribe   => File["${basedir_path}/Dockerfile"],
     environment => $exec_environment,
     logoutput   => $exec_logoutput,
-    refreshonly => true,
+    refreshonly => $exec_refreshonly,
     require     => Class['docker'],
   }
 

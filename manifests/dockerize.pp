@@ -78,6 +78,7 @@ define docker::dockerize (
       repository       => $real_repository,
       repository_tag   => $real_repository_tag,
       exec_environment => $exec_environment,
+      workdir          => $workdir,
     }
   }
 

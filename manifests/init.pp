@@ -3,10 +3,10 @@
 class docker (
 
   Variant[Boolean,String] $ensure           = present,
+
+  String                  $install_class    = '::docker::install::tp',
+ 
   String[1]               $username         = 'example42',
-  
-  Hash                    $confs            = { },
-  Hash                    $dirs             = { },
 
   Hash                    $options          = { },
   Hash                    $settings         = { },
@@ -35,13 +35,8 @@ class docker (
     $service_notify = undef
   }
 
-  tp::install { 'docker':
-    options_hash  => $options,
-    settings_hash => $module_settings,
-    data_module   => $data_module,
-    conf_hash     => $confs,
-    dir_hash      => $dirs,
-    auto_conf     => $auto_conf,
+  if $install_class != '' {
+    include $install_class
   }
 
   if $profiles != [] {
