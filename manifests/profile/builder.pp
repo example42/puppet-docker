@@ -45,6 +45,8 @@ class docker::profile::builder (
       repository       => pick($opts['repository'],$image),
       repository_tag   => pick($opts['repository_tag'],$real_repository_tag),
       exec_environment => pick($opts['exec_environment'],$exec_environment),
+      prepend_lines    => pick($opts['prepend_lines'],[]),
+      append_lines     => pick($opts['append_lines'],[]),
       exec_logoutput   => pick($opts['exec_logoutput'],$exec_logoutput),
       always_build     => pick($opts['always_build'],$always_build),
       build_options    => pick_default($opts['build_options'],$build_options),

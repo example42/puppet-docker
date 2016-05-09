@@ -15,16 +15,17 @@ define docker::build (
 
   Variant[Undef,String]                  $maintainer          = undef,
   String                                 $from                = '',
-
   Variant[Undef,String]                  $repository          = $title,
   Variant[Undef,String]                  $repository_tag      = 'latest',
+  Pattern[/command|supervisor/]          $command_mode        = 'supervisor',
+  Array                                  $prepend_lines       = [],
+  Array                                  $append_lines        = [],
 
   Variant[Undef,Array]                   $exec_environment    = undef,
   Variant[Boolean,Pattern[/on_failure/]] $exec_logoutput      = 'on_failure',
 
   Boolean                                $always_build        = true,
   String                                 $build_options       = '',
-  Pattern[/command|supervisor/]          $command_mode        = 'supervisor',
 
   Boolean                                $mount_data_dir      = true,
   Boolean                                $mount_log_dir       = true,

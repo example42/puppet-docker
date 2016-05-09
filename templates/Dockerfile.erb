@@ -4,6 +4,11 @@ FROM <%= @real_from %>
 MAINTAINER <%= @maintainer %>
 <% end -%>
 
+<% if @prepend_lines -%>
+<% @prepend_lines.each do |pline| -%>
+<%= pline %>
+<% end -%>
+<% end -%>
 <% if @image_os == 'debian' or @image_os == 'ubuntu' -%>
 <% if @settings['repo_url'] -%>
 RUN echo 'deb <%= @settings['repo_url'] -%> <%= @settings['apt_release'] %> <%= @settings['apt_repos'] %>' > /etc/apt/sources.list.d/<%= @app %>.list
@@ -59,4 +64,10 @@ CMD [ <% comma = '' %><% @settings['process_args'].split.each do |ar| %><%= comm
 <% end -%>
 <% if @command_mode == 'supervisor' %>
 CMD [ "/usr/bin/<%= @settings_supervisor['process_name'] -%>" , "-c" , "<%= @settings_supervisor['config_file_path'] -%>" ]
+<% end -%>
+
+<% if @append_lines -%>
+<% @append_lines.each do |line| -%>
+<%= line %>
+<% end -%>
 <% end -%>
