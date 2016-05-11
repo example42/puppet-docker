@@ -9,11 +9,17 @@ MAINTAINER <%= @maintainer %>
 <%= pline %>
 <% end -%>
 <% end -%>
+<% if @settings['dockerfile_prerequisites'] -%>
+<%= @settings['dockerfile_prerequisites'] %>
+<% end -%>
 <% if @image_os == 'debian' or @image_os == 'ubuntu' -%>
 <% if @settings['repo_url'] -%>
 RUN echo 'deb <%= @settings['repo_url'] -%> <%= @settings['apt_release'] %> <%= @settings['apt_repos'] %>' > /etc/apt/sources.list.d/<%= @app %>.list
 <% if @settings['apt_key_server'] -%>
 RUN apt-key add --keyserver <%= @settings['apt_key_server'] %> --recv-key <%= @settings['key'] %>
+<% end -%>
+<% if @settings['key_url'] -%>
+RUN wget -O - <%= @settings['key_url'] %> | apt-key add -
 <% end -%>
 <% end -%>
 RUN apt-get update && \
@@ -41,7 +47,7 @@ destfile = @settings_supervisor['config_file_path']
 else
 destfile = @settings_supervisor['conf_dir_path'] + "/" + @app + ".conf"
 end -%>
-RUN echo -e '[supervisord]\nnodaemon=true\n\n[program:<%= @settings['process_name'] %>]\ncommand=<%= @settings['process_name'] %> <% if @settings['process_extra_name'] -%><%= @settings['process_extra_name'] -%><% end -%> <% if @settings['process_args'] -%><%= @settings['process_args'] %><% end -%> <% if @settings['nodaemon_args'] -%><%= @settings['nodaemon_args'] %><% end -%>' >> <%= destfile %>
+RUN echo -e "[supervisord]\nnodaemon=true\n\n[program:<%= @settings['process_name'] %>]\ncommand=<%= @settings['process_name'] %> <% if @settings['process_extra_name'] -%><%= @settings['process_extra_name'] -%><% end -%> <% if @settings['process_args'] -%><%= @settings['process_args'] %><% end -%> <% if @settings['nodaemon_args'] -%><%= @settings['nodaemon_args'] %><% end -%>" >> <%= destfile %>
 <% end -%>
 
 <% if @settings['tcp_port'] -%>
