@@ -9,11 +9,17 @@ MAINTAINER <%= @maintainer %>
 <%= pline %>
 <% end -%>
 <% end -%>
+<% if @settings['dockerfile_prerequisites'] -%>
+<%= @settings['dockerfile_prerequisites'] %>
+<% end -%>
 <% if @image_os == 'debian' or @image_os == 'ubuntu' -%>
 <% if @settings['repo_url'] -%>
 RUN echo 'deb <%= @settings['repo_url'] -%> <%= @settings['apt_release'] %> <%= @settings['apt_repos'] %>' > /etc/apt/sources.list.d/<%= @app %>.list
 <% if @settings['apt_key_server'] -%>
 RUN apt-key add --keyserver <%= @settings['apt_key_server'] %> --recv-key <%= @settings['key'] %>
+<% end -%>
+<% if @settings['key_url'] -%>
+RUN wget -O - <%= @settings['key_url'] %> | apt-key add -
 <% end -%>
 <% end -%>
 RUN apt-get update && \

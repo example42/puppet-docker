@@ -12,8 +12,8 @@
     1. Create your feature branch: `git checkout -b my-new-feature`
     1. Commit your changes: `git commit -am 'Add some feature'`
     1. Push to the branch: `git push origin my-new-feature`
-    1. Submit a pull request
-  * Ensure the PR description clearly describes the problem and solution. Include the relevant issue number if applicable.
+    1. Submit a pull request via GitHub's web interface
+  * Ensure the PR description clearly describes the problem and its solution. Include the relevant issue number if applicable.
 
 #### **Do You Intend to Add a New Feature or Change an Existing One?**
 
