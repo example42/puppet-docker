@@ -31,17 +31,19 @@ RUN yum install -y epel-release
 RUN yum install -y <%= @settings['package_name'] %> <% if @command_mode == 'supervisor' -%><%= @settings_supervisor['package_name'] %><% end -%> && yum clean all
 <% end -%>
 <% if @image_os == 'alpine' -%>
+<% if @settings['package_name'] != '' -%>
 RUN echo -e 'http://dl-3.alpinelinux.org/alpine/edge/testing\nhttp://dl-3.alpinelinux.org/alpine/edge/community' >> /etc/apk/repositories
 RUN apk --no-cache add <%= @settings['package_name'] %> <% if @command_mode == 'supervisor' -%><%= @settings_supervisor['package_name'] %><% end %>
+<% end -%>
 <% end -%>
 
 <% if @command_mode == 'supervisor' -%>
 <% if @settings_supervisor['conf_dir_path'].to_s.empty?
 destfile = @settings_supervisor['config_file_path']
 else
-destfile = @settings_supervisor['conf_dir_path'] + "/" + @app + ".conf"
+destfile = @settings_supervisor['conf_dir_path'] + "/" + @app + "." + @settings_supervisor['config_file_extension']
 end -%>
-RUN echo -e '[supervisord]\nnodaemon=true\n\n[program:<%= @settings['process_name'] %>]\ncommand=<%= @settings['process_name'] %> <% if @settings['process_extra_name'] -%><%= @settings['process_extra_name'] -%><% end -%> <% if @settings['process_args'] -%><%= @settings['process_args'] %><% end -%> <% if @settings['nodaemon_args'] -%><%= @settings['nodaemon_args'] %><% end -%>' >> <%= destfile %>
+RUN echo -e "[supervisord]\nnodaemon=true\n\n[program:<%= @settings['process_name'] %>]\ncommand=<%= @settings['process_name'] %> <% if @settings['process_extra_name'] -%><%= @settings['process_extra_name'] -%><% end -%> <% if @settings['process_args'] -%><%= @settings['process_args'] %><% end -%> <% if @settings['nodaemon_args'] -%><%= @settings['nodaemon_args'] %><% end -%>" >> <%= destfile %>
 <% end -%>
 
 <% if @settings['tcp_port'] -%>
@@ -63,7 +65,7 @@ CMD [ <% comma = '' %><% @settings['process_args'].split.each do |ar| %><%= comm
 <% end -%>
 <% end -%>
 <% if @command_mode == 'supervisor' %>
-CMD [ "/usr/bin/<%= @settings_supervisor['process_name'] -%>" , "-c" , "<%= @settings_supervisor['config_file_path'] -%>" ]
+CMD [ "/usr/bin/<%= @settings_supervisor['process_name'] -%>" , "-n" , "-c" , "<%= @settings_supervisor['config_file_path'] -%>" ]
 <% end -%>
 
 <% if @append_lines -%>
