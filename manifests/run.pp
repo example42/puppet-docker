@@ -6,7 +6,7 @@ define docker::run (
 
   String[1]               $ensure              = 'running',
 
-  Variant[Undef,String]   $image               = undef,
+  Variant[Undef,String]   $image               = '',
   String                  $command             = '',
 
   String[1]               $username            = undef,
@@ -42,10 +42,15 @@ define docker::run (
     undef   => $::docker::username,
     default => $username
   }
-  $app = regsubst($title, '[^0-9A-Za-z.\-]', '-', 'G')
+  $title_elements = split ($title, '::')
+  $app = $title_elements[0]
   #  $tp_app_settings = tp_lookup($app,'settings',$::docker::tinydata_module,'merge')
   # $app_settings = $tp_app_settings + $settings
 
+  $real_image = $image ? {
+    ''      => "${real_username}/${repository}:${repository_tag}",
+    default => $image,
+  }
 
   if $run_mode == 'command' {
     Exec {
@@ -55,15 +60,11 @@ define docker::run (
       logoutput   => $exec_logoutput,
     }
 
-    $real_image = $image ? {
-      undef   => "${real_username}/${repository}:${repository_tag}",
-      default => $image,
-    }
-    $cidfile = "/var/run/${service_prefix}${app}.cid"
+    $cidfile = "/var/run/${service_prefix}${title}.cid"
 
     exec { "docker run ${real_image}":
       command     => "docker run -d ${run_options} --name ${app} --cidfile=${cidfile} ${real_image} ${command}",
-      unless      => "docker ps --no-trunc -a | grep `cat ${cidfile}`",
+      unless      => "docker ps --no-trunc | grep `cat ${cidfile}`",
     }
   }
 
@@ -72,28 +73,31 @@ define docker::run (
     $service_ensure = $ensure ? {
       'absent' => 'stopped',
       false    => 'stopped',
-      default  => $::docker::module_settings['service_ensure'],
+      default  => 'running',
     }
     $service_enable = $ensure ? {
       'absent' => false,
       false    => false,
-      default  => $::docker::module_settings['service_enable'],
+      default  => true,
     }
     case $::docker::module_settings['init_system'] {
       'upstart': {
         $initscript_file_path = "/etc/init/${service_prefix}${app}.conf"
         $default_template = 'docker/run/upstart.erb'
         $init_file_mode = '0644'
+        $service_provider = 'upstart'
       }
       'systemd': {
         $initscript_file_path = "/etc/systemd/system/${service_prefix}${app}.service"
         $default_template = 'docker/run/systemd.erb'
         $init_file_mode = '0644'
+        $service_provider = 'systemd'
       }
       'sysvinit': {
         $initscript_file_path = "/etc/init.d/${service_prefix}${app}"
         $default_template = 'docker/run/sysvinit.erb'
         $init_file_mode = '0755'
+        $service_provider = undef
       }
     }
 
@@ -104,8 +108,10 @@ define docker::run (
       notify  => Service["docker-${app}"],
     }
     service { "docker-${app}":
-      ensure  => $service_ensure,
-      enable  => $service_enable,
+      ensure    => $service_ensure,
+      enable    => $service_enable,
+      provider  => $service_provider,
+      require   => Service[$::docker::module_settings['service_name']],
     }
   }
 }

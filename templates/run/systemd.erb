@@ -20,7 +20,9 @@ ExecStartPre=-/usr/bin/docker kill <%= @app %>
     <%= @real_image %> \
     <% if @command %> <%= @command %><% end %>
 <% end -%>
+<% if @extra_systemd_parameters -%>
 <% @extra_systemd_parameters.each do |key, value| -%><%= key %>=<%= value %>
+<% end -%>
 <% end -%>
 <%- if @pull_on_start %>ExecStartPre=-/usr/bin/docker pull <%= @real_image %>
 <% end -%>
@@ -38,4 +40,4 @@ ExecStop=-/usr/bin/docker stop <%= @app %>
 <% end -%>
 
 [Install]
-wantedBy=multi-user.target
+WantedBy=multi-user.target
