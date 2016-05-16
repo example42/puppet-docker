@@ -1,6 +1,8 @@
-# @define docker::build
+# @define docker::tp_build
 #
-define docker::build (
+# Build multi OS Docker images using Tiny puppet
+#
+define docker::tp_build (
 
   String[1]                              $ensure              = 'present',
 
@@ -132,7 +134,7 @@ define docker::build (
     environment => $exec_environment,
     logoutput   => $exec_logoutput,
     refreshonly => $exec_refreshonly,
-    require     => Class['docker'],
+    require     => Class[$::docker::install_class],
   }
 
 }

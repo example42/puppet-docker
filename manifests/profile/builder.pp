@@ -34,7 +34,7 @@ class docker::profile::builder (
     default => $repository_tag,
   }
   $images.each |$image,$opts| {
-    docker::build { $image:
+    docker::tp_build { $image:
       ensure           => pick_default($opts['ensure'],$ensure),
       template         => pick_default($opts['template'],$template),
       workdir          => pick_default($opts['workdir'],$workdir),

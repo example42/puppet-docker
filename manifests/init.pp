@@ -49,7 +49,7 @@ class docker (
     create_resources('docker::run', $run )
   }
   if $build {
-    create_resources('docker::build', $build )
+    create_resources('docker::tp_build', $build )
   }
   if $test {
     create_resources('docker::test', $test )
