@@ -1,4 +1,4 @@
-# == Class: docker::compose
+# == Class: docker::profile::compose
 #
 # Class to install Docker Compose using the recommended curl command.
 # Original source: https://github.com/garethr/garethr-docker/blob/master/manifests/compose.pp
@@ -10,21 +10,20 @@
 #   Valid values are absent present
 #   Defaults to present
 #
-# [*real_version*]
+# [*version*]
 #   The real_version of Docker Compose to install.
-#   Defaults to the value set in $docker::params::compose_real_version
 #
-class docker::compose(
+class docker::profile::compose(
   Variant[Boolean,String]  $ensure           = present,
   Hash                     $options          = { },
   Variant[Undef,String[1]] $template         = undef,
-  Variant[Undef,String[1]] $version          = undef,
+  String                   $version          = '',
 ) {
 
-  include docker
+  include ::docker
 
-  $real_version = $version {
-    undef   => $::docker::settings['compose_version'],
+  $real_version = $version ? {
+    ''      => $::docker::module_settings['compose_version'],
     default => $version,
   }
 

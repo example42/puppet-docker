@@ -71,7 +71,7 @@ define docker::dockerize (
 
   # Dockerfile creation
   if $build {
-    docker::build { $app:
+    docker::tp_build { $app:
       ensure           => $ensure,
       build_options    => $build_options,
       username         => $username,
