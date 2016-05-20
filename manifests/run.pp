@@ -1,6 +1,7 @@
 # @define docker::run
 #
 # This define manages and runs a container based on the given docker image
+# Derived from https://github.com/garethr/garethr-docker/blob/master/manifests/run.pp
 #
 define docker::run (
 
@@ -9,7 +10,7 @@ define docker::run (
   Variant[Undef,String]   $image               = '',
   String                  $command             = '',
 
-  String[1]               $username            = undef,
+  String                  $username            = '',
   Variant[Undef,String]   $repository          = $title,
   Variant[Undef,String]   $repository_tag      = undef,
 
@@ -38,9 +39,15 @@ define docker::run (
 
   include ::docker
 
-  $real_username = $username ? {
-    undef   => $::docker::username,
-    default => $username
+  $sanitised_title = $title
+  # $sanitised_title = regsubst($title, '[^0-9A-Za-z.\-]', '-', 'G')
+
+  $username_prefix = $username ? {
+    ''      => $::docker::username ? {
+      ''      => '',
+      default => "${::docker::username}/",
+    },
+    default => "${username}/",
   }
   $title_elements = split ($title, '::')
   $app = $title_elements[0]
@@ -48,7 +55,7 @@ define docker::run (
   # $app_settings = $tp_app_settings + $settings
 
   $real_image = $image ? {
-    ''      => "${real_username}/${repository}:${repository_tag}",
+    ''      => "${username_prefix}/${repository}:${repository_tag}",
     default => $image,
   }
 
@@ -60,11 +67,22 @@ define docker::run (
       logoutput   => $exec_logoutput,
     }
 
-    $cidfile = "/var/run/${service_prefix}${title}.cid"
-
-    exec { "docker run ${real_image}":
-      command     => "docker run -d ${run_options} --name ${app} --cidfile=${cidfile} ${real_image} ${command}",
-      unless      => "docker ps --no-trunc | grep `cat ${cidfile}`",
+    $cidfile = "/var/run/${service_prefix}${sanitised_title}.cid"
+    $exec_command = $ensure ? {
+      'running' => "docker run -d ${run_options} --name ${sanitised_title} --cidfile=${cidfile} ${real_image} ${command}",
+      'present' => "docker run -d ${run_options} --name ${sanitised_title} --cidfile=${cidfile} ${real_image} ${command}",
+      'stopped' => "docker stop ${sanitised_title}",
+      'absent'  => "docker stop ${sanitised_title} ; docker rm ${sanitised_title}",
+    }
+    $exec_unless = $ensure ? {
+      'running' => "docker ps --no-trunc | grep `cat ${cidfile}`",
+      'present' => "docker ps --no-trunc | grep `cat ${cidfile}`",
+      'stopped' => "docker ps --no-trunc | grep `cat ${cidfile}` || true",
+      'absent'  => "docker ps --no-trunc | grep `cat ${cidfile}` || true",
+    }
+    exec { "docker run ${sanitised_title}":
+      command     => $exec_command,
+      unless      => $exec_unless,
     }
   }
 
@@ -82,19 +100,19 @@ define docker::run (
     }
     case $::docker::module_settings['init_system'] {
       'upstart': {
-        $initscript_file_path = "/etc/init/${service_prefix}${app}.conf"
+        $initscript_file_path = "/etc/init/${service_prefix}${sanitised_title}.conf"
         $default_template = 'docker/run/upstart.erb'
         $init_file_mode = '0644'
         $service_provider = 'upstart'
       }
       'systemd': {
-        $initscript_file_path = "/etc/systemd/system/${service_prefix}${app}.service"
+        $initscript_file_path = "/etc/systemd/system/${service_prefix}${sanitised_title}.service"
         $default_template = 'docker/run/systemd.erb'
-        $init_file_mode = '0644'
+         $init_file_mode = '0644'
         $service_provider = 'systemd'
       }
       'sysvinit': {
-        $initscript_file_path = "/etc/init.d/${service_prefix}${app}"
+        $initscript_file_path = "/etc/init.d/${service_prefix}${sanitised_title}"
         $default_template = 'docker/run/sysvinit.erb'
         $init_file_mode = '0755'
         $service_provider = undef
@@ -103,11 +121,11 @@ define docker::run (
 
     file { $initscript_file_path:
       ensure  => $ensure,
-      content => template(pick_default($init_template,$default_template)),
+      content => template(pick($init_template,$default_template)),
       mode    => $init_file_mode,
       notify  => Service["docker-${app}"],
     }
-    service { "docker-${app}":
+    service { "${service_prefix}${sanitised_title}":
       ensure    => $service_ensure,
       enable    => $service_enable,
       provider  => $service_provider,

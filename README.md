@@ -113,7 +113,7 @@ The images to build are defined in the ```images``` hash. The following example 
       apache:
         ensure: present
 
-      # Build a redis image using a custom Dockerfile template with an added custom redis.conf template with relevsnt options
+      # Build a redis image using a custom Dockerfile template with an added custom redis.conf template with relevant options
       redis:
         ensure: present
         template: 'profile/ecommerce/redis/Dockerfile.erb'
@@ -213,7 +213,19 @@ This class installs docker-compose directly from GitHub.
 
 ### define docker::run
 
-TODO
+This define manages the execution of a container. Usage is like:
+
+  ::docker::run { 'jenkins':
+    image            => 'jenkins',
+    run_mode         => 'command',
+    run_options      => '-p 8080:8080 -p 50000:50000',
+  }
+
+  If no ```image``` is set, the base image is ```"${username}/${repository}:${repository_tag}"``` (use this for custom images created with docker::push):
+
+  ::docker::run { 'puppet-agent': }
+
+Check che class ```docker::profile::run_examples.pp``` for more usage samples.
 
 
 ### define docker::tp_build

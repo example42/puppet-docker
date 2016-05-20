@@ -9,7 +9,7 @@ define docker::tp_build (
   Variant[Undef,String]                  $template            = 'docker/Dockerfile.erb',
   String[1]                              $workdir             = '/var/tmp',
 
-  String[1]                              $username            = '',
+  String                                 $username            = '',
 
   String                                 $image_name          = '',
   String[1]                              $image_os            = downcase($::operatingsystem),
@@ -55,9 +55,16 @@ define docker::tp_build (
     ''      => "${image_os}:${image_osversion}",
     default => $from,
   }
-  $basedir_path = "${workdir}/${username}/${image_os}/${image_osversion}/${app}"
+  $username_prefix = $username ? {
+    ''      => $::docker::username ? {
+      ''      => '',
+      default => "${::docker::username}/",
+    },
+    default => "${username}/",
+  }
+  $basedir_path = "${workdir}/${username_prefix}${image_os}/${image_osversion}/${app}"
   $real_image_name = $image_name ? {
-    ''      => "${username}/${repository}:${repository_tag}",
+    ''      => "${username_prefix}${repository}:${repository_tag}",
     default => $image_name,
   }
 
