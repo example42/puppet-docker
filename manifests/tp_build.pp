@@ -134,6 +134,10 @@ define docker::tp_build (
     true  => false,
     false => true,
   }
+  $exec_require = $::docker::install_class ? {
+    ''      => undef,
+    default => Class[$::docker::install_class],
+  }
   exec { "docker build ${build_options} -t ${real_image_name} ${basedir_path}":
     command     => "docker build ${build_options} -t ${real_image_name} ${basedir_path}",
     cwd         => $basedir_path,
@@ -141,7 +145,7 @@ define docker::tp_build (
     environment => $exec_environment,
     logoutput   => $exec_logoutput,
     refreshonly => $exec_refreshonly,
-    require     => Class[$::docker::install_class],
+    require     => $exec_require,
   }
 
 }
