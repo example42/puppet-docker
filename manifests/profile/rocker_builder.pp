@@ -27,7 +27,7 @@ class docker::profile::rocker_builder (
   Boolean                 $push                = false,
 ) {
 
-  include ::docker
+  #  include ::docker
 
   $real_repository_tag=$repository_tag ? {
     undef   => "${default_image_os}-${default_image_osversion}",
