@@ -4,7 +4,7 @@ class docker::profile::builder (
   Hash                    $images              = {},
 
   Variant[Undef,String]   $template            = 'docker/Dockerfile.erb',
-  String[1]               $workdir             = '/var/dockerfiles',
+  String[1]               $workdir             = '/var/tmp/dockerfiles',
 
   Variant[Undef,String]   $maintainer          = undef,
   String                  $from                = '',
