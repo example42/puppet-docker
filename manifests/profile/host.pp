@@ -9,6 +9,7 @@ class docker::profile::host (
   Variant[Boolean,Pattern[/on_failure/]] $exec_logoutput = 'on_failure',
 
   Pattern[/command|service/] $run_mode         = 'service',
+  String                  $run_options         = '',
 
   Boolean                 $mount_data_dir      = true,
   Boolean                 $mount_log_dir       = true,
@@ -28,6 +29,7 @@ class docker::profile::host (
       exec_environment => pick_default($opts['exec_environment'],$exec_environment),
       exec_logoutput   => pick_default($opts['exec_logoutput'],$exec_logoutput),
       run_mode         => pick_default($opts['run_mode'],$run_mode),
+      run_options      => pick_default($opts['run_options'],$run_options),
       mount_data_dir   => pick_default($opts['mount_data_dir'],$mount_data_dir),
       mount_log_dir    => pick_default($opts['mount_log_dir'],$mount_log_dir),
     }
