@@ -6,7 +6,7 @@ class docker::profile::run_examples (
 
   include ::docker
 
-  # Run, in command mode, a container based on official jenkins image
+  # Run, in command mode, a container based on official jenkins image
   ::docker::run { 'jenkins':
     ensure           => $ensure,
     image            => 'jenkins',

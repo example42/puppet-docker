@@ -6,7 +6,7 @@ class docker::profile::build_examples (
 
   include ::docker
 
-  # Run, in command mode, a container based on official jenkins image
+  # Run, in command mode, a container based on official jenkins image
   ::docker::tp_build { 'memcached': 
     ensure           => $ensure,
   }

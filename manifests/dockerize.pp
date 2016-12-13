@@ -3,9 +3,9 @@
 # This define dockerizes an application.
 # It can:
 #   - Create a dockerfile based on tinydata (default: false)
-#   - Build the relevant image (default:false)
-#   - Push the image to Docker Hub (default:false)
-#   - Run the image from the Docker Hub (default:true)
+#   - Build the relevant image (default:false)
+#   - Push the image to Docker Hub (default:false)
+#   - Run the image from the Docker Hub (default:true)
 #
 define docker::dockerize (
 

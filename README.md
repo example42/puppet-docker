@@ -76,7 +76,7 @@ The most important parameters (here written as configurable via Hiera with Yaml 
 
     # Set any option you may want to use in templates 
     docker::options:
-      my_key: my_value # In an erb template this is accessed with <%= @options['my_key'] %> 
+      my_key: my_value # In an erb template this is accessed with <%= @options['my_key'] %> 
 
     # Define what module to use for Tiny Puppet data:
     docker::data_module: docker # Default
@@ -134,35 +134,35 @@ The images to build are defined in the ```images``` hash. The following example 
 
 Various parameters of this class allow you to set the default settings for these images (you can override them for each image):
 
-    # The erb template to use for the Dockerfile
-    docker::profile::builder::template: 'docker/Dockerfile.erb' # Default.
+    # The erb template to use for the Dockerfile
+    docker::profile::builder::template: 'docker/Dockerfile.erb' # Default.
 
     # The working directory where all the Dockerbuild and build roots are created:
     docker::profile::builder::workdir: '/var/dockerfiles' # Default
 
     # The Maintainer string to add to the Dockerfile
-    docker::profile::builder::maintainer: undef # Default
+    docker::profile::builder::maintainer: undef # Default
 
-    # The from field to add to the Dockerfile. By default official Docker images are used according to the underlying OS.
+    # The from field to add to the Dockerfile. By default official Docker images are used according to the underlying OS.
     # Note that if you choose a base image with a different OS things won't probably work as expected (you need to have a MultiOS build setup for that)
     docker::profile::builder::from: ''  # Default
 
-    # The image OS and version to use (by default they are autocalculated according to OS facts):
-    docker::profile::builder::default_image_os: centos # Default is downcase($::operatingsystem)
-    docker::profile::builder::default_image_osversion: 7 # Default is $::operatingsystemmajrelease
+    # The image OS and version to use (by default they are autocalculated according to OS facts):
+    docker::profile::builder::default_image_os: centos # Default is downcase($::operatingsystem)
+    docker::profile::builder::default_image_osversion: 7 # Default is $::operatingsystemmajrelease
 
-    # The repository tag (on Docker Hub) to use. Default: ```"${default_image_os}-${default_image_osversion}"```
+    # The repository tag (on Docker Hub) to use. Default: ```"${default_image_os}-${default_image_osversion}"```
     docker::profile::builder::repository_tag
 
-    # An array of environment variables for the docker build exec resource
+    # An array of environment variables for the docker build exec resource
     docker::profile::builder::exec_environment:
       - 'http_proxy=proxy.example.com'
   
     # An option to force image building at every puppet run, even if no changes have occurred
-    docker::profile::builder::always_build: false # Default
+    docker::profile::builder::always_build: false # Default
 
     # Optional extra options to pass to the docker build command
-    docker::profile::builder::build_options: '' # Default
+    docker::profile::builder::build_options: '' # Default
 
     # How the application inside the image should be run: via command or supervisor
     docker::profile::builder::command_mode: 'supervisor'
@@ -186,7 +186,7 @@ In the following example 4 instances are being enabled. The solr one is from an 
     
 Also here you can set some defaults to apply to all the instances:
 
-    # An array of environment variables for the docker run exec resource
+    # An array of environment variables for the docker run exec resource
     docker::profile::host::exec_environment:
       - 'http_proxy=proxy.example.com'
 
@@ -197,19 +197,19 @@ Also here you can set some defaults to apply to all the instances:
     docker::profile::host::mount_data_dir: true # Default
     docker::profile::host::mount_log_dir: true # Default
 
-    # The repository tag (on Docker Hub) to use.
-    docker::profile::host::repository_tag: latest # Default
+    # The repository tag (on Docker Hub) to use.
+    docker::profile::host::repository_tag: latest # Default
 
 
 ### class docker::profile::compose
 
 This class installs docker-compose directly from GitHub. 
 
-    # To manage installation status
-    docker::profile::compose::ensure: present # Default
+    # To manage installation status
+    docker::profile::compose::ensure: present # Default
     
-    # To specify the version to install
-    docker::profile::compose::version: '1.7.0' # Default is set in $settings['compose_version']
+    # To specify the version to install
+    docker::profile::compose::version: '1.7.0' # Default is set in $settings['compose_version']
 
 ### define docker::run
 

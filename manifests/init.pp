@@ -39,7 +39,7 @@ class docker (
     include $install_class
   }
 
-  if $profiles != [] {
+  if $profiles != [] {
     $profiles.each |$kl| {
       include "::docker::profile::${kl}"
     }
