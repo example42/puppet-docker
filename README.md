@@ -32,7 +32,7 @@ It also can configure nodes for different functions:
 It provides Puppet user defines for different functions:
 
   - ```::docker::run``` to run containers (either as services or via direct exec)
-  - ```::docker::tp_build``` to build multi OS images installing an application and managing its configurations
+  - ```::docker::tp_build``` to build images via tp (no Puppet installed on images)
   - ```::docker::push``` to push images to Docker's registry
 
 This module follows these design principles:
