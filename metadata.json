@@ -1,6 +1,6 @@
 {
   "name": "example42-docker",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "summary": "Docker module",
   "license": "Apache-2.0",
   "author": "Alessandro Franceschi",
