@@ -12,15 +12,18 @@ class docker::profile::run_examples (
     image            => 'jenkins',
     run_mode         => 'command',
     run_options      => '-p 8080:8080 -p 50000:50000',
+    require          => Class['docker'],
   }
 
   # Run a local image built with docker::push
-  ::docker::run { 'puppet-agent': 
-    ensure           => $ensure,
-  }
-  ::docker::run { 'apache': 
-    ensure           => $ensure,
-  }
+#  ::docker::run { 'puppet-agent': 
+#    ensure           => $ensure,
+#    require          => Class['docker'],
+#  }
+#  ::docker::run { 'apache': 
+#    ensure           => $ensure,
+#    require          => Class['docker'],
+#  }
 
 
   # Run, in service mode (an init file is created and a service started), an official redis instance
@@ -29,6 +32,7 @@ class docker::profile::run_examples (
     image            => 'redis',
     # run_mode         => 'service',
     container_name   => 'official_redis',
+    require          => Class['docker'],
   }
  
   ::docker::run { 'registry':
@@ -37,6 +41,7 @@ class docker::profile::run_examples (
     repository_tag   => '2.4.0',
     run_mode         => 'command',
     run_options      => '-p 5000:5000',
+    require          => Class['docker'],
   }
 
 }
