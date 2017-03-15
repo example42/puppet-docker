@@ -33,6 +33,9 @@ rm -rf /var/lib/apt/lists/*
 <% if @settings['repo_url'] -%>
 RUN echo -e '[<%= @app %>]\nname=<%= @app %> repository\nbaseurl=<%= @settings['repo_url'] -%>\ngpgkey=<%= @settings['key_url'] %>' > /etc/yum.repos.d/<%= @app %>.repo
 <% end -%>
+<% if @settings['repo_package_url'] -%>
+RUN rpm -i <%= @settings['repo_package_url'] %>
+<% end -%>
 RUN yum install -y epel-release
 RUN yum install -y <%= @settings['package_name'] %> <% if @command_mode == 'supervisor' -%><%= @settings_supervisor['package_name'] %><% end -%> && yum clean all
 <% end -%>

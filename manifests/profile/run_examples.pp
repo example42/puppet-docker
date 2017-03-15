@@ -44,4 +44,12 @@ class docker::profile::run_examples (
     require          => Class['docker'],
   }
 
+  ::docker::run { 'admiral':
+    ensure           => $ensure,
+    image            => 'vmware/admiral',
+    run_mode         => 'service',
+    run_options      => '-p 8282:8282',
+    require          => Class['docker'],
+  }
+
 }
