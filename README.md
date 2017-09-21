@@ -55,7 +55,7 @@ To install one of the internal profiles for different Docker applications or use
 
 ## Usage
 
-The module's common paramateres entry point is the main class, which is included by all the profiles and defines.
+The module's common parameters entry point is the main class, which is included by all the profiles and defines.
 
 The most important parameters (here written as configurable via Hiera with Yaml backend, you can obviously pass them when declaring the docker class):
 
